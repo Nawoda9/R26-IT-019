@@ -81,3 +81,25 @@ Thumbs.db
 # =========================
 .vscode/
 .idea/
+
+# =========================
+# PyTorch Models
+# =========================
+*.pth
+*.pt
+
+# =========================
+# Temporary Prediction Files
+# =========================
+temp/
+tmp/
+
+# =========================
+# SQLite Viewer Temporary Files
+# =========================
+*.db-journal
+
+# =========================
+# Python Cache
+# =========================
+.python-version
