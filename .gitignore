@@ -1,0 +1,83 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.venv/
+.env
+
+# =========================
+# Node / React / Vite / Next.js
+# =========================
+node_modules/
+.next/
+dist/
+build/
+.vite/
+
+# =========================
+# Local Database Files
+# =========================
+*.sqlite
+*.sqlite3
+*.db
+
+# Keep database folder structure but ignore actual DB files
+backend/*/database/*.sqlite
+backend/*/database/*.db
+
+# =========================
+# Uploaded / Runtime Images
+# =========================
+uploads/
+backend/*/uploads/*
+!backend/*/uploads/.gitkeep
+
+# =========================
+# Dataset and ML Model Files
+# =========================
+dataset/
+datasets/
+ml_models/germplasm_classification_model/dataset/
+
+*.zip
+*.h5
+*.keras
+*.pkl
+*.joblib
+
+# Keep model folder structure but ignore large model files
+backend/*/models/*.h5
+backend/*/models/*.keras
+backend/*/models/*.pkl
+backend/*/models/*.joblib
+
+# Allow small class mapping files to be pushed
+!backend/*/models/class_names.json
+
+# =========================
+# Jupyter / Colab
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# System Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Editor / IDE
+# =========================
+.vscode/
+.idea/
