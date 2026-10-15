@@ -1,0 +1,18 @@
+{
+  "model_name": "efficientnet_b0",
+  "image_size": 224,
+  "num_classes": 4,
+  "class_to_idx": {
+    "Healthy_Leaves": 0,
+    "WCLWD_DryingofLeaflets": 1,
+    "WCLWD_Flaccidity": 2,
+    "WCLWD_Yellowing": 3
+  },
+  "healthy_class": "Healthy_Leaves",
+  "healthy_idx": 0,
+  "pytorch_version": "2.10.0+cu128",
+  "export_format": {
+    "pth": "PyTorch state_dict",
+    "pt": "TorchScript"
+  }
+}

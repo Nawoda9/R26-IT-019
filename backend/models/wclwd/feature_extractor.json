@@ -1,0 +1,32 @@
+{
+  "base_model": "efficientnet_b0",
+  "extraction_method": "timm forward_features() -> forward_head(pre_logits=True)",
+  "feature_dim": 1280,
+  "input_size": [
+    3,
+    224,
+    224
+  ],
+  "preprocessing": {
+    "steps": [
+      "cv2 denoise (fastNlMeansDenoisingColored)",
+      "CLAHE contrast enhancement",
+      "resize",
+      "scale to [0,1]",
+      "normalize with ImageNet mean/std"
+    ],
+    "mean": [
+      0.48500001430511475,
+      0.4560000002384186,
+      0.4059999883174896
+    ],
+    "std": [
+      0.2290000021457672,
+      0.2240000069141388,
+      0.22499999403953552
+    ]
+  },
+  "weights_file": "feature_extractor.pt",
+  "weights_format": "TorchScript (torch.jit.trace)",
+  "pytorch_version": "2.10.0+cu128"
+}
