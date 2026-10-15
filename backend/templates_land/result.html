@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <h1>🌴 Analysis Results</h1>
+    <p>Confidence threshold used: {{ confidence_threshold }}</p>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if result.warning %}
+      <div class="card">
+        <div class="flash">{{ result.warning }}</div>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <h2>Summary</h2>
+      <div class="grid">
+        <div class="stat">
+          <div class="value">{{ result.detected_trees }}</div>
+          <div class="label">Trees detected</div>
+        </div>
+        {% if result.land_utilization %}
+        <div class="stat">
+          <div class="value">{{ result.land_utilization.utilized_pct }}%</div>
+          <div class="label">Utilized (circle-buffer)</div>
+        </div>
+        <div class="stat">
+          <div class="value">{{ result.land_utilization.available_pct }}%</div>
+          <div class="label">Available (circle-buffer)</div>
+        </div>
+        {% endif %}
+        {% if result.vegetation %}
+        <div class="stat">
+          <div class="value">{{ result.vegetation.available_pct }}%</div>
+          <div class="label">Available (pixel-accurate)</div>
+        </div>
+        {% endif %}
+        {% if result.planting_capacity %}
+        <div class="stat">
+          <div class="value">{{ result.planting_capacity.new_trees_that_fit }}</div>
+          <div class="label">New trees that actually fit</div>
+        </div>
+        {% endif %}
+      </div>
+      {% if result.class_breakdown %}
+        <p><strong>Class breakdown:</strong>
+        {% for name, count in result.class_breakdown.items() %}
+          {{ name }}: {{ count }}{% if not loop.last %}, {% endif %}
+        {% endfor %}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>1. Detections</h2>
+      <img class="result-image" src="{{ url_for('static', filename='results/' + result.images.detections) }}" alt="Detections">
+    </div>
+
+    {% if result.images.heatmap %}
+    <div class="card">
+      <h2>2. Land Utilization Heatmap</h2>
+      <p>Canopy buffer used: {{ result.land_utilization.buffer_px }} px</p>
+      <img class="result-image" src="{{ url_for('static', filename='results/' + result.images.heatmap) }}" alt="Heatmap">
+    </div>
+    {% endif %}
+
+    {% if result.images.empty_space %}
+    <div class="card">
+      <h2>3. Pixel-Accurate Empty Space & Planting Pockets</h2>
+      <img class="result-image" src="{{ url_for('static', filename='results/' + result.images.empty_space) }}" alt="Empty space">
+      {% if result.vegetation.top_pockets %}
+      <table class="pockets">
+        <thead><tr><th>#</th><th>x (px)</th><th>y (px)</th><th>clearance (px)</th></tr></thead>
+        <tbody>
+          {% for p in result.vegetation.top_pockets %}
+          <tr><td>{{ loop.index }}</td><td>{{ p.x }}</td><td>{{ p.y }}</td><td>{{ p.clearance_px }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if result.images.mask_sanity %}
+    <div class="card">
+      <h2>Debug: Vegetation Mask Sanity Check</h2>
+      <img class="result-image" src="{{ url_for('static', filename='results/' + result.images.mask_sanity) }}" alt="Mask sanity check">
+    </div>
+    {% endif %}
+
+    {% if result.images.planting_capacity %}
+    <div class="card">
+      <h2>4. Real Planting Capacity</h2>
+      <p>
+        Existing trees: {{ result.planting_capacity.existing_trees }} &middot;
+        New trees that fit: {{ result.planting_capacity.new_trees_that_fit }} &middot;
+        Required spacing: {{ result.planting_capacity.required_spacing_px }} px
+      </p>
+      <img class="result-image" src="{{ url_for('static', filename='results/' + result.images.planting_capacity) }}" alt="Planting capacity">
+    </div>
+    {% endif %}
+
+    <a class="back-link" href="{{ url_for('index') }}">&larr; Analyze another image</a>
+  </main>
+
+  <footer>Coconut / Palm Tree Detection web app</footer>
+</body>
+</html>
