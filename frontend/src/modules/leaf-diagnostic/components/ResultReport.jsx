@@ -1,4 +1,3 @@
-
 import StageLabel from "./StageLabel";
 import SeverityBadge from "./SeverityBadge";
 import DsiGauge from "./DsiGauge";
@@ -6,7 +5,6 @@ import ProbabilityBars from "./ProbabilityBars";
 import ImagePanel from "./ImagePanel";
 import AbcdTable from "./AbcdTable";
 import { severityKey } from "../../../lib/severity";
-import ManagementPlanButton from "../../../components/ManagementPlanButton";
 
 export default function ResultReport({ result, onReset }) {
   const key = severityKey(result.severity);
@@ -41,9 +39,12 @@ export default function ResultReport({ result, onReset }) {
         </button>
       </div>
 
-      {/* OOD RESULT */}
+      {/* ============================================================
+          OOD RESULT
+          ============================================================ */}
       {isOOD ? (
         <section className="space-y-6">
+          {/* OOD Status */}
           <div className="border border-severity-critical/30 bg-[#F7E2DE] text-severity-critical rounded-sm px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="h-3 w-3 rounded-full bg-severity-critical" />
@@ -61,6 +62,7 @@ export default function ResultReport({ result, onReset }) {
             </div>
           </div>
 
+          {/* Original Image Only */}
           {result.images?.original && (
             <div>
               <StageLabel
@@ -79,6 +81,7 @@ export default function ResultReport({ result, onReset }) {
             </div>
           )}
 
+          {/* OOD Explanation */}
           <div className="border border-ink/10 bg-ink/[0.03] rounded-sm px-5 py-4">
             <p className="text-sm text-ink-muted">
               This image cannot be reliably classified by the current
@@ -88,7 +91,9 @@ export default function ResultReport({ result, onReset }) {
           </div>
         </section>
       ) : (
-        /* NORMAL RESULT */
+        /* ============================================================
+           NORMAL RESULT
+           ============================================================ */
         <>
           <section>
             <StageLabel
@@ -161,11 +166,6 @@ export default function ResultReport({ result, onReset }) {
               No lesion segmentation is run for healthy predictions —
               nothing to score.
             </p>
-          )}
-
-          {/* Recommended Management Action */}
-          {hasLesionData && (
-            <ManagementPlanButton result={result} />
           )}
         </>
       )}
