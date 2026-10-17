@@ -81,25 +81,19 @@ Thumbs.db
 # =========================
 .vscode/
 .idea/
+# Environment variants; keep the example
+.env.*
+!.env.example
 
-# =========================
-# PyTorch Models
-# =========================
-*.pth
+# PyTorch models
 *.pt
+*.pth
 
-# =========================
-# Temporary Prediction Files
-# =========================
+# Temporary files
 temp/
 tmp/
-
-# =========================
-# SQLite Viewer Temporary Files
-# =========================
 *.db-journal
-
-# =========================
-# Python Cache
-# =========================
 .python-version
+
+# Generated runs
+backend/runs/
