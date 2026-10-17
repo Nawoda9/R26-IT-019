@@ -85,9 +85,15 @@ Thumbs.db
 .env.*
 !.env.example
 
-# PyTorch model files
+# PyTorch models
 *.pt
 *.pth
+
+# Temporary files
+temp/
+tmp/
+*.db-journal
+.python-version
 
 # Generated runs
 backend/runs/
