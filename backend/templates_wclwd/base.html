@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WCLWD Severity Assessment{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="wrap">
+            <h1>🌴 WCLWD Detection &amp; Severity Assessment</h1>
+            <p class="subtitle">Weligama Coconut Leaf Wilt Disease &mdash; detection, WSSS explainability &amp; ABCD severity scoring</p>
+        </div>
+    </header>
+    <main class="wrap">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="wrap">
+            <p>EfficientNet-B0 classifier &middot; Grad-CAM + GrabCut WSSS &middot; ABCD Disease Severity Index</p>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

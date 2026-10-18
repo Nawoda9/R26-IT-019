@@ -1,0 +1,17 @@
+{
+  "img_size": 224,
+  "normalize_mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "normalize_std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "resize_mode": "resize_square",
+  "log_scale": 10.007925033569336,
+  "embedding_dim": 512,
+  "distance_metric": "cosine"
+}
