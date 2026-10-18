@@ -22,7 +22,7 @@ export default function Header({ active, onChange, user, onLogout }) {
   alt=""
   className="h-20 w-20 shrink-0 object-contain"
 />
-          Coconut Diagnostics Suite..
+          Coconut Diagnostics Suite
         </button>
 
         <nav className="flex flex-wrap items-center gap-1" role="tablist" aria-label="Sections">
