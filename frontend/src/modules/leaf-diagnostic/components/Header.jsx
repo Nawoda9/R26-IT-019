@@ -25,7 +25,7 @@ export default function Header({ healthStatus }) {
         </h1>
         <p className="text-ink-muted max-w-xl mt-1">
           Upload a leaf photo to run detection, weakly-supervised lesion
-          segmentation, and ABCD severity scoring in one pass.
+          segmentation, and ABCD severity scoring in one pass
         </p>
       </div>
     </header>
