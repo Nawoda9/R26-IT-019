@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-line box-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(24, 36, 23, 0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+  :focus-visible {
+    outline: 2px solid #2f5233;
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: #2f5233;
+    color: #f6f7f1;
+  }
+
+  /* Thin scrollbar to match the field-diagnostic feel */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f6f7f1;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #b9c4af;
+    border-radius: 6px;
+  }
+}
+
+@layer utilities {
+  /* Signature corner-bracket frame used by the leaf-diagnostic upload slot */
+  .corner-frame {
+    position: relative;
+  }
+  .corner-frame::before,
+  .corner-frame::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: currentColor;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .corner-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+  .corner-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+  }
+
+  /* -------------------------------------------------------------------
+     "Viewfinder" frame used by the canopy-survey module: four corner
+     brackets + coordinate ticks, echoing a drone camera's targeting
+     reticle. Recolored to the shared field-diagnostic palette (palm
+     green / line) so it reads as the same product as the leaf module.
+     ------------------------------------------------------------------- */
+  .viewfinder {
+    position: relative;
+    border: 1px solid #dce3d6;
+  }
+
+  .viewfinder .vf-corner-tl,
+  .viewfinder .vf-corner-tr,
+  .viewfinder .vf-corner-bl,
+  .viewfinder .vf-corner-br {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+
+  .viewfinder .vf-corner-tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid #2f5233;
+    border-left: 2px solid #2f5233;
+  }
+  .viewfinder .vf-corner-tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid #2f5233;
+    border-right: 2px solid #2f5233;
+  }
+  .viewfinder .vf-corner-bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid #2f5233;
+    border-left: 2px solid #2f5233;
+  }
+  .viewfinder .vf-corner-br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid #2f5233;
+    border-right: 2px solid #2f5233;
+  }
+
+  /* Coordinate tick marks along the top edge of a viewfinder frame */
+  .vf-ticks {
+    background-image: repeating-linear-gradient(
+      90deg,
+      #dce3d6 0,
+      #dce3d6 1px,
+      transparent 1px,
+      transparent 12px
+    );
+    background-position: bottom;
+    background-size: 100% 6px;
+    background-repeat: no-repeat;
+  }
+
+  /* Subtle woven-coir texture used by the variety-classifier module's
+     upload dropzone. Recolored from the module's original husk-brown to
+     the shared theme's rust accent. */
+  .bg-coir-texture {
+    background-image: repeating-linear-gradient(
+      115deg,
+      rgba(184, 92, 46, 0.05) 0px,
+      rgba(184, 92, 46, 0.05) 2px,
+      transparent 2px,
+      transparent 7px
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

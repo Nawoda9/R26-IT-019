@@ -81,3 +81,13 @@ Thumbs.db
 # =========================
 .vscode/
 .idea/
+# Environment variants; keep the example
+.env.*
+!.env.example
+
+# PyTorch model files
+*.pt
+*.pth
+
+# Generated runs
+backend/runs/
