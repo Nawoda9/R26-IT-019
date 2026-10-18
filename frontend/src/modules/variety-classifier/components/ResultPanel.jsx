@@ -7,13 +7,13 @@ function EmptyState() {
   return (
     <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-2 text-center">
       <span className="text-3xl opacity-40" aria-hidden="true">
-        ✂️🥥
+        🥥
       </span>
       <p className="font-display text-base text-ink-muted">
         Your identification will appear here
       </p>
       <p className="max-w-[26ch] text-sm text-ink-muted/80">
-        Select a location, upload a photo, and classify it to see the variety and confidence breakdown.
+        See the full breakdown.
       </p>
     </div>
   );
