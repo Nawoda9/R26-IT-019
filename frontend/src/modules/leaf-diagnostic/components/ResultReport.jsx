@@ -5,6 +5,7 @@ import ProbabilityBars from "./ProbabilityBars";
 import ImagePanel from "./ImagePanel";
 import AbcdTable from "./AbcdTable";
 import { severityKey } from "../../../lib/severity";
+import ManagementPlanButton from "../../../components/ManagementPlanButton";
 
 export default function ResultReport({ result, onReset }) {
   const key = severityKey(result.severity);
@@ -166,6 +167,11 @@ export default function ResultReport({ result, onReset }) {
               No lesion segmentation is run for healthy predictions —
               nothing to score.
             </p>
+          )}
+
+          {/* Recommended Management Action */}
+          {hasLesionData && (
+           <ManagementPlanButton result={result} />
           )}
         </>
       )}
