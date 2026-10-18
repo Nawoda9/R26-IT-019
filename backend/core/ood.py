@@ -70,5 +70,6 @@ class MahalanobisOOD:
 
         nearest_class = int(dists.argmin(axis=1)[0])
         min_dist = float(dists.min(axis=1)[0])
+        ## Threshold comparison
         is_ood = bool(min_dist > self.threshold)
         return min_dist, nearest_class, is_ood
