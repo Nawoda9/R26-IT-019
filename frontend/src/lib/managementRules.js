@@ -85,7 +85,7 @@ const MANAGEMENT_RULES = {
         "Check for possible associated conditions, including leaf rot.",
         "Record the assessment and follow the authorised management advice."
       ],
-      note: "Tree removal should not be decided by the visual model alone."
+      note: "Tree removal should not be decided by this visual model alone."
     },
     severe: {
       title: "Severe leaflet drying detected",
