@@ -23,6 +23,7 @@ const PIN_ZOOM = 13;
 const SEARCH_ZOOM = 14;
 const SEARCH_DEBOUNCE_MS = 400;
 
+//open strreet map api for reverse geocoding and search
 async function reverseGeocode(lat, lng, signal) {
   try {
     const res = await fetch(
