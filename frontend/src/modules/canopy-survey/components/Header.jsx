@@ -4,7 +4,7 @@ export default function Header({ backendOnline }) {
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <span className="font-mono text-[11px] tracking-[0.2em] text-rust">
-            CANOPY SURVEY — FLIGHT REVIEW
+            CANOPY SURVEY — FLIGHT REVIEW.
           </span>
           <span className="flex items-center gap-1.5 font-mono text-[11px] text-ink-muted">
             <span
