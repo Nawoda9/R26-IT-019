@@ -16,7 +16,7 @@ const MANAGEMENT_RULES = {
       priority: "Agricultural inspection recommended",
       actions: [
         "Arrange a field assessment to review the suspected disease and palm condition.",
-        "Document the symptoms and review previous assessment results.",
+        "Document symptoms and review previous assessment results.",
         "Ask the agricultural officer to assess whether nutrient deficiencies or other conditions also need investigation."
       ],
       note: "NPK fertilizer or magnesium sulfate should not be prescribed automatically from this visual classification."
