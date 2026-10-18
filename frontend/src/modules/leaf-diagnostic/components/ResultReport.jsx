@@ -165,7 +165,7 @@ export default function ResultReport({ result, onReset }) {
           {!hasLesionData && (
             <p className="text-ink-muted text-sm">
               No lesion segmentation is run for healthy predictions —
-              nothing to score.
+              nothing to score here.
             </p>
           )}
 
