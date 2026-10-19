@@ -219,8 +219,8 @@ def all_history():
         "has_next": pagination.has_next,
     })
 
-
-@bp.route("/api/history/<int:history_id>", methods=["GET"])
+"""get the details of a specific prediction history entry by its ID, 
+including the original image and Grad-CAM overlay if available. The user_id is required"""
 def history_detail(history_id):
     user_id = _parse_user_id(request.args.get("user_id"))
     if user_id is None:

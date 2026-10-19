@@ -7,6 +7,10 @@ main app's auth database). The original photo and the Grad-CAM overlay are
 stored directly as binary columns in this table — nothing is written to
 disk — so history/images travel with the DB (backups, migrations, etc.)
 with no separate file-storage step to keep in sync.
+
+Instead of saving images to disk and dealing with file orphan issues,
+both the original uploaded photo (image_data) and the Grad-CAM overlay (gradcam_data) 
+are stored directly inside the SQLite row as binary blobs 
 """
 
 import json
