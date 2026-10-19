@@ -1,295 +1,129 @@
-"""
-main.py — Launch all Coconut Flask backends simultaneously
-
-Usage:
-    python main.py
-
-Stop:
-    Ctrl+C
-
-All Flask apps live in the same backend/ folder and share
-the same Python virtual environment and requirements.txt.
-"""
-
+"""Run from backend/: python main.py. Ctrl+C stops all owned servers."""
+import os
+from pathlib import Path
+import signal
+import socket
 import subprocess
 import sys
-import os
-import signal
 import time
+from urllib.error import URLError
+from urllib.request import ProxyHandler, build_opener
 
 from dotenv import load_dotenv
 
-
-# ============================================================
-# PATH CONFIGURATION
-# ============================================================
-
-# Since main.py is already inside:
-#
-# D:\Outsource\2026\coconut-project\backend
-#
-# BASE_DIR is the backend directory.
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Do NOT append another "backend" here.
-BACKEND_DIR = BASE_DIR
-
-
-# ============================================================
-# LOAD ENVIRONMENT VARIABLES
-# ============================================================
-
-ENV_FILE = os.path.join(BACKEND_DIR, ".env")
-
-if os.path.exists(ENV_FILE):
-    load_dotenv(ENV_FILE)
-    print(f"[OK]  Loaded environment variables from: {ENV_FILE}")
-else:
-    print(f"[WARN] .env file not found: {ENV_FILE}")
-
-
-# ============================================================
-# APPLICATION CONFIGURATION
-# ============================================================
-
+BASE = Path(__file__).resolve().parent
 APPS = [
-    {
-        "name": "WCLWD Leaf Diagnostic",
-        "script": "wclwd_app.py",
-        "port": 5000,
-    },
-    {
-        "name": "Canopy & Land Survey",
-        "script": "land_app.py",
-        "port": 5001,
-    },
-    {
-        "name": "Coconut Variety Classifier",
-        "script": "variety_app.py",
-        "port": 5002,
-    },
-    {
-        "name": "Coconut Classifier",
-        "script": "app.py",
-        "port": 5003,
-    },
+    ("Login / Treatment Advisor", "app.py", 5003, "/api/health"),
+    ("Leaf Wilt", "wclwd_app.py", 5000, "/health"),
+    ("Land Survey", "land_app.py", 5001, "/healthz"),
+    ("Variety Classifier", "variety_app.py", 5002, "/health"),
 ]
+PROCESSES = []
+HTTP = build_opener(ProxyHandler({}))
 
 
-# ============================================================
-# PROCESS STORAGE
-# ============================================================
-
-processes = []
-
-
-# ============================================================
-# START ALL APPLICATIONS
-# ============================================================
-
-def launch_all():
-
-    for app in APPS:
-
-        script_path = os.path.join(
-            BACKEND_DIR,
-            app["script"]
-        )
-
-        # ----------------------------------------------------
-        # Check whether the application exists
-        # ----------------------------------------------------
-
-        if not os.path.exists(script_path):
-
-            print(
-                f"[WARN] '{script_path}' not found "
-                f"— skipping {app['name']}"
-            )
-
-            continue
-
-        print(
-            f"[INFO] Starting {app['name']}..."
-        )
-
-        # ----------------------------------------------------
-        # Copy current environment
-        # ----------------------------------------------------
-
-        env = os.environ.copy()
-
-        # Give this application its own port
-        env["PORT"] = str(app["port"])
-
-        # ----------------------------------------------------
-        # Start Flask application
-        # ----------------------------------------------------
-
-        proc = subprocess.Popen(
-            [
-                sys.executable,
-                app["script"]
-            ],
-            cwd=BACKEND_DIR,
-            env=env
-        )
-
-        processes.append(proc)
-
-        print(
-            f"[OK]  Started '{app['name']}' "
-            f"(PID {proc.pid}) "
-            f"→ http://localhost:{app['port']}"
-        )
-
-        # Small delay so the applications don't all
-        # start at exactly the same time.
-        time.sleep(0.5)
+def port_in_use(port):
+    with socket.socket() as connection:
+        connection.settimeout(0.3)
+        return connection.connect_ex(("127.0.0.1", port)) == 0
 
 
-# ============================================================
-# SHUTDOWN
-# ============================================================
+def healthy(port, path):
+    try:
+        with HTTP.open(f"http://127.0.0.1:{port}{path}", timeout=2) as response:
+            return response.status == 200
+    except (URLError, OSError, ValueError):
+        return False
 
-def shutdown(sig=None, frame=None):
 
-    print("\n[INFO] Shutting down all servers...")
-
-    # --------------------------------------------------------
-    # Terminate all running processes
-    # --------------------------------------------------------
-
-    for proc in processes:
-
-        if proc.poll() is None:
-
-            try:
-                proc.terminate()
-
-            except Exception:
-                pass
-
-    # --------------------------------------------------------
-    # Wait for processes to stop
-    # --------------------------------------------------------
-
-    for proc in processes:
-
+def stop_all():
+    # Reloaders are disabled, so each service has one owned process.
+    for _, process in PROCESSES:
+        if process.poll() is None:
+            process.terminate()
+    for _, process in PROCESSES:
         try:
-
-            proc.wait(timeout=5)
-
+            process.wait(timeout=10)
         except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
 
-            print(
-                f"[WARN] Process {proc.pid} "
-                f"did not stop gracefully. Killing..."
+
+def interrupted(_signal, _frame):
+    raise KeyboardInterrupt
+
+
+def main():
+    load_dotenv(BASE / ".env")
+    timeout = float(os.getenv("BACKEND_STARTUP_TIMEOUT", "600"))
+    if timeout <= 0:
+        raise ValueError("BACKEND_STARTUP_TIMEOUT must be positive")
+    # Validate before launching anything. Never stop someone else's server.
+    for name, script, port, _ in APPS:
+        if not (BASE / script).is_file():
+            raise RuntimeError(f"Missing {script}; put this launcher in backend/.")
+        if port_in_use(port):
+            raise RuntimeError(f"Port {port} for {name} is occupied. Stop the old server first.")
+    try:
+        for name, script, port, path in APPS:
+            environment = os.environ.copy()
+            environment.update(PORT=str(port), FLASK_DEBUG="0", PYTHONUNBUFFERED="1")
+            # runpy supplies the usual __main__ context while disabling Flask's
+            # reloader even in scripts with a hardcoded debug=True setting.
+            bootstrap = (
+                "import flask,runpy,sys; "
+                "original=flask.Flask.run; "
+                "flask.Flask.run=lambda self,*a,**kw: original(self,*a,"
+                "**dict(kw,debug=False,use_reloader=False)); "
+                "runpy.run_path(sys.argv[1],run_name='__main__')"
             )
+            print(f"[STARTING] {name} on port {port}", flush=True)
+            options = {}
+            if os.name == "nt":
+                options["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+            process = subprocess.Popen(
+                [sys.executable, "-u", "-c", bootstrap, script],
+                cwd=BASE, env=environment, **options,
+            )
+            PROCESSES.append((name, process))
+            deadline = time.monotonic() + timeout
+            next_notice = time.monotonic() + 15
+            while True:
+                for running_name, running_process in PROCESSES:
+                    code = running_process.poll()
+                    if code is not None:
+                        raise RuntimeError(f"{running_name} exited with code {code}. Check its error above.")
+                if healthy(port, path):
+                    print(f"[READY] {name}: http://127.0.0.1:{port}", flush=True)
+                    break
+                if time.monotonic() >= deadline:
+                    raise RuntimeError(f"{name} was not ready after {timeout:g}s. Check its logs and model files.")
+                if time.monotonic() >= next_notice:
+                    print(f"[WAITING] {name} is still loading...", flush=True)
+                    next_notice = time.monotonic() + 15
+                time.sleep(1)
+        print("[READY] All four backends responded. Keep this terminal open. Ctrl+C stops them.", flush=True)
+        failures = set()
+        while True:
+            for name, process in PROCESSES:
+                if process.poll() is not None and name not in failures:
+                    failures.add(name)
+                    print(f"[OFFLINE] {name} exited with code {process.returncode}. Other servers remain running.", flush=True)
+            if len(failures) == len(PROCESSES):
+                return 1
+            time.sleep(1)
+    finally:
+        stop_all()
+    return 0
 
-            try:
-                proc.kill()
-
-            except Exception:
-                pass
-
-    print("[INFO] All servers stopped.")
-
-    sys.exit(0)
-
-
-# ============================================================
-# MAIN
-# ============================================================
 
 if __name__ == "__main__":
-
-    # --------------------------------------------------------
-    # Handle Ctrl+C
-    # --------------------------------------------------------
-
-    signal.signal(
-        signal.SIGINT,
-        shutdown
-    )
-
-    # --------------------------------------------------------
-    # Handle termination signal
-    # --------------------------------------------------------
-
-    signal.signal(
-        signal.SIGTERM,
-        shutdown
-    )
-
-    # --------------------------------------------------------
-    # Header
-    # --------------------------------------------------------
-
-    print("=" * 55)
-    print(
-        "  Coconut Diagnostics Suite — Multi-App Launcher"
-    )
-    print("=" * 55)
-
-    print(
-        f"[INFO] Backend directory: {BACKEND_DIR}"
-    )
-
-    # --------------------------------------------------------
-    # Start applications
-    # --------------------------------------------------------
-
-    launch_all()
-
-    print("-" * 55)
-
-    if processes:
-
-        print(
-            "  All available servers are running."
-        )
-
-        print(
-            "  Press Ctrl+C to stop all."
-        )
-
-    else:
-
-        print(
-            "  No servers were started."
-        )
-
-    print(
-        "  Frontend (run separately): "
-        "cd frontend && npm run dev\n"
-    )
-
-    # --------------------------------------------------------
-    # Keep launcher alive
-    # --------------------------------------------------------
-
+    signal.signal(signal.SIGTERM, interrupted)
     try:
-
-        while True:
-
-            active_processes = [
-                proc
-                for proc in processes
-                if proc.poll() is None
-            ]
-
-            # If all child processes stopped
-            if not active_processes:
-
-                print(
-                    "[WARN] All backend processes have stopped."
-                )
-
-                break
-
-            time.sleep(1)
-
+        sys.exit(main())
     except KeyboardInterrupt:
-
-        shutdown()
+        print("\n[STOPPED] Backend servers stopped.")
+        sys.exit(0)
+    except (RuntimeError, ValueError, OSError) as error:
+        print(f"[ERROR] {error}", file=sys.stderr, flush=True)
+        sys.exit(1)
