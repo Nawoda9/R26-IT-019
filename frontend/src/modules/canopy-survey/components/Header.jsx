@@ -1,3 +1,4 @@
+//header frontend
 export default function Header({ backendOnline }) {
   return (
     <header className="border-b border-line">
