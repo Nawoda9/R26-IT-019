@@ -1,3 +1,4 @@
+//header frontend
 export default function Header({ backendOnline }) {
   return (
     <header className="border-b border-line">
@@ -23,7 +24,7 @@ export default function Header({ backendOnline }) {
           Upload an aerial plantation image. The model detects each coconut canopy,
           measures how much ground they occupy, segments the actual bare soil
           pixel-by-pixel, and estimates how many new trees can realistically be
-          planted with proper spacing.
+          planted with proper spacing..
         </p>
       </div>
     </header>
